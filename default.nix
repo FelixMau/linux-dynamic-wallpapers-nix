@@ -70,8 +70,10 @@ EOF
       between multiple images throughout a 24-hour cycle.
     '';
     homepage = "https://github.com/saint-13/Linux_Dynamic_Wallpapers";
+    changelog = "https://github.com/saint-13/Linux_Dynamic_Wallpapers/commits/main";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
-    maintainers = [ ];
+    maintainers = with maintainers; ["FelixMau"]; 
+    mainProgram = null; 
   };
 }

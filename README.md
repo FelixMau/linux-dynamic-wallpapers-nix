@@ -1,121 +1,172 @@
-# Linux Dynamic Wallpapers for NixOS
+# Linux Dynamic Wallpapers for NixOS 🌄
 
-Ein Nix-Paket für die komplette [Linux Dynamic Wallpapers](https://github.com/saint-13/Linux_Dynamic_Wallpapers) Sammlung mit 109+ dynamischen Wallpapers für GNOME.
+A NixOS/Home Manager package providing **109+ professional dynamic wallpapers** for GNOME with time-based transitions.
 
-## Features
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Nix](https://img.shields.io/badge/Built%20with-Nix-5277C3.svg?logo=nixos)](https://nixos.org)
 
-- **109+ dynamische Wallpapers** mit zeitbasierten Übergängen
-- **Nicht nur hell/dunkel**: Mehrere Bilder pro Tag mit sanften Übergängen
-- **Vielfältige Kategorien**: Natur, Abstract, Apple-Designs, Anime, und mehr
-- **GNOME-Integration**: Erscheint automatisch in den GNOME-Hintergrundeinstellungen
-- **NixOS/Home Manager freundlich**: Deklarative Konfiguration
+> This is a complete NixOS/Home Manager port of [saint-13/Linux_Dynamic_Wallpapers](https://github.com/saint-13/Linux_Dynamic_Wallpapers) - bringing macOS-style time-based wallpapers to Linux.
 
-## Installation
+## ✨ Features
 
-### Option 1: Direkt in home.nix
+- 🎨 **109+ Dynamic Wallpapers** with smooth time-based transitions
+- ⏰ **More than just light/dark** - Multiple images throughout the 24-hour cycle
+- 🖼️ **Full GNOME integration** - Appears directly in Settings → Appearance
+- 📦 **Declarative configuration** - Pure NixOS/Home Manager setup
+- 🚀 **Zero manual installation** - No scripts, just Nix
 
-Füge das Paket zu deinen Home Manager Paketen hinzu:
+## 🖼️ Gallery
+
+The collection includes wallpapers in various categories:
+
+| Category | Examples |
+|----------|----------|
+| **macOS Inspired** | BigSur (8 variants), Monterey, Mojave, Catalina |
+| **Nature** | Mountains, Desert, Forest, Lakeside, Ocean |
+| **Abstract** | Aura, Blobs, Material Design, Nord Theme |
+| **Lofi/Anime** | LofiGirl, AnimeRoom, CatherineRoom |
+| **OS Themes** | Ubuntu, Windows 11, Elementary, GNOME 42 |
+| **Gaming** | Firewatch, Witcher, Cyberpunk |
+
+![BigSur Example](https://raw.githubusercontent.com/saint-13/Linux_Dynamic_Wallpapers/main/Screenshots/BigSur.png)
+
+*Example: BigSur wallpaper transitioning through 8 different time-of-day variants*
+
+## 🚀 Quick Start
+
+### Using Flakes (Recommended)
+
+1. Add to your `flake.nix`:
 
 ```nix
-{ config, pkgs, ... }:
-
 {
-  home.packages = with pkgs; [
-    linux-dynamic-wallpapers
-  ];
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    linux-dynamic-wallpapers.url = "github:YOUR_USERNAME/linux-dynamic-wallpapers-nix";
+  };
 
-  # Verlinke Wallpapers in dein Home-Verzeichnis
-  xdg.dataFile = {
-    "backgrounds/Dynamic_Wallpapers" = {
-      source = "${pkgs.linux-dynamic-wallpapers}/share/backgrounds/Dynamic_Wallpapers";
-      recursive = true;
-    };
-    "gnome-background-properties" = {
-      source = "${pkgs.linux-dynamic-wallpapers}/share/gnome-background-properties";
-      recursive = true;
+  outputs = { nixpkgs, home-manager, linux-dynamic-wallpapers, ... }: {
+    nixosConfigurations.your-hostname = nixpkgs.lib.nixosSystem {
+      modules = [
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.users.your-username = {
+            imports = [ linux-dynamic-wallpapers.homeManagerModules.default ];
+            programs.linux-dynamic-wallpapers.enable = true;
+          };
+        }
+      ];
     };
   };
 }
 ```
 
-### Option 2: Mit Home Manager Modul (vereinfacht)
-
-Importiere das mitgelieferte Modul in deine home.nix:
-
-```nix
-{ config, pkgs, ... }:
-
-{
-  imports = [
-    /etc/nixos/pkgs/linux-dynamic-wallpapers/home-manager-module.nix
-  ];
-
-  programs.linux-dynamic-wallpapers.enable = true;
-}
-```
-
-## Verwendung
-
-Nach der Installation und einem `nixos-rebuild switch`:
-
-1. Öffne **GNOME Settings** → **Appearance** → **Background**
-2. Die dynamischen Wallpapers erscheinen in der Wallpaper-Auswahl
-3. Wähle einen Wallpaper aus - er ändert sich automatisch basierend auf der Tageszeit
-
-## Verfügbare Wallpapers (Auswahl)
-
-- **Apple-Designs**: BigSur, Monterey, Mojave, Catalina
-- **Natur**: Mountains, Desert, Forest, Lake, Ocean
-- **Abstract**: Aura, Globe, Material, Blobs
-- **Lofi/Anime**: AnimeRoom, LofiGirl, verschiedene Stile
-- **OS-Themes**: Ubuntu, Windows 11, Elementary OS, GNOME 42
-- Und viele mehr...
-
-## Technische Details
-
-### Wie funktionieren die dynamischen Wallpapers?
-
-Die Wallpapers verwenden GNOME's XML-basiertes Format für zeitbasierte Hintergründe:
-
-- `<static>`: Zeigt ein Bild für eine bestimmte Dauer (in Sekunden)
-- `<transition>`: Sanfter Übergang zwischen zwei Bildern über eine Zeitspanne
-
-Beispiel (BigSur hat 8 verschiedene Bilder über den Tag verteilt):
-- 4 Stunden Nachtbild → 3h Übergang → Morgengrauen → ...
-
-### Unterschied zum existierenden `dynamic-wallpaper` Paket
-
-Das existierende nixpkgs `dynamic-wallpaper` Paket ist ein **Tool zum Erstellen** von dynamischen Wallpapers.
-
-Dieses Paket (`linux-dynamic-wallpapers`) ist:
-- Eine fertige **Bibliothek von 109+ professionellen Wallpapers**
-- Sofort nutzbar ohne eigene Erstellung
-- Mit komplexen Multi-Bild-Animationen (nicht nur hell/dunkel)
-
-## Lokale Entwicklung
-
-Falls du das lokale Repository für Tests verwenden möchtest:
-
-```nix
-# In pkgs/linux-dynamic-wallpapers/default.nix
-src = /home/felix/Linux_Dynamic_Wallpapers;  # Statt fetchFromGitHub
-```
-
-## Hash aktualisieren
-
-Beim ersten Build wird Nix den korrekten Hash anzeigen:
+2. Rebuild and enjoy:
 
 ```bash
-sudo nixos-rebuild build --flake .#Desktop
-# Kopiere den angezeigten Hash in default.nix
+sudo nixos-rebuild switch --flake .#your-hostname
 ```
 
-## Lizenz
+3. Select wallpapers in **Settings → Appearance → Background**
 
-Die Original-Wallpapers sind GPL-3.0+ lizenziert.
-Siehe: https://github.com/saint-13/Linux_Dynamic_Wallpapers
+## 📖 Documentation
 
-## Credits
+- [Quick Start Guide](./README_COMMUNITY.md) - Detailed installation instructions
+- [German Documentation](./USAGE_DE.md) - Deutsche Dokumentation
+- [Configuration Examples](./example-home.nix) - Sample configurations
 
-- Original-Repository: [saint-13/Linux_Dynamic_Wallpapers](https://github.com/saint-13/Linux_Dynamic_Wallpapers)
-- Nix-Paket erstellt für die NixOS-Community
+## ⚙️ Configuration
+
+### Basic Usage
+
+```nix
+programs.linux-dynamic-wallpapers.enable = true;
+```
+
+### Set a Default Wallpaper
+
+```nix
+programs.linux-dynamic-wallpapers = {
+  enable = true;
+  defaultWallpaper = "BigSur";
+};
+```
+
+### Handle Existing Files
+
+```nix
+programs.linux-dynamic-wallpapers = {
+  enable = true;
+  forceOverwrite = true;  # Overwrites conflicting files
+};
+```
+
+## 🎯 How It Works
+
+Dynamic wallpapers use GNOME's XML format with timed transitions:
+
+```
+BigSur Example (24-hour cycle):
+00:00 - 04:00 → Night scene
+04:00 - 07:00 → Smooth transition to sunrise
+07:00 - 10:30 → Morning scene
+10:30 - 14:00 → Midday scene
+...continues through 8 different images
+```
+
+## 🆚 Comparison
+
+| Package | Type | Content |
+|---------|------|---------|
+| `dynamic-wallpaper` (nixpkgs) | Tool | Create your own wallpapers |
+| `linux-dynamic-wallpapers` (this) | Library | 109+ ready-to-use wallpapers |
+
+## 🛠️ Development
+
+### Local Testing
+
+```bash
+# Build the package
+nix build .#linux-dynamic-wallpapers
+
+# Test with home-manager
+home-manager switch --flake .#your-config
+```
+
+### Using Local Wallpapers
+
+Edit `default.nix`:
+```nix
+src = /path/to/Linux_Dynamic_Wallpapers;  # Requires --impure
+```
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+
+1. For new wallpapers: Contribute to [upstream repository](https://github.com/saint-13/Linux_Dynamic_Wallpapers)
+2. For package improvements: Open an issue/PR here
+3. For bugs: File an issue with your NixOS version
+
+## 📜 License
+
+GPL-3.0-or-later
+
+This package redistributes content from [Linux_Dynamic_Wallpapers](https://github.com/saint-13/Linux_Dynamic_Wallpapers), licensed under GPL-3.0+.
+
+## 🙏 Credits
+
+- **Wallpapers**: [saint-13/Linux_Dynamic_Wallpapers](https://github.com/saint-13/Linux_Dynamic_Wallpapers)
+- **NixOS Package**: Created for the NixOS community
+- **Contributors**: See [CONTRIBUTORS](./CONTRIBUTORS) (if you create one)
+
+## 📚 Resources
+
+- [Original Repository](https://github.com/saint-13/Linux_Dynamic_Wallpapers)
+- [GNOME Wallpaper Docs](https://help.gnome.org/admin/system-admin-guide/stable/backgrounds.html)
+- [Home Manager Manual](https://nix-community.github.io/home-manager/)
+
+---
+
+**Enjoy beautiful time-based wallpapers on NixOS!** 🎉
