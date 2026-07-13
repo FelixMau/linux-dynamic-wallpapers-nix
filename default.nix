@@ -73,7 +73,6 @@ EOF
     changelog = "https://github.com/saint-13/Linux_Dynamic_Wallpapers/commits/main";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
-    maintainers = with maintainers; ["FelixMau"]; 
-    mainProgram = null; 
+    maintainers = with maintainers; ["FelixMau"];
   };
 }
